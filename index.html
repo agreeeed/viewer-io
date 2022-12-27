@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Viewer</title>
+	<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+	<style>
+		body{background: #101820;color: #eee;text-align: center;font-family: 'Lato', sans-serif;-webkit-tap-highlight-color: transparent}
+		a{text-decoration: none;color: #eee;font-size: 16px;font-family: inherit;background: #006747;padding: 8px;border-radius: 5px;display: flex;margin: 8px;}
+		.main{display: flex;flex-wrap: wrap;margin: 1rem 1.5rem;}
+		.control{margin-top: 1.5rem;}
+		#viewallaze, #viewalltr{background-color: #412b68;}
+		h2{font-weight: lighter;}
+		p{font-size: 14px;margin: 1rem 0;color: #ccc;}
+		button{font-family: 'Lato', sans-serif;outline: none;border: none;border-radius: 5px;cursor: pointer;transition: .2s background;width: 44px;height: 44px;margin: 0 0.5rem;}
+		#rf{font-size: 20px;background-color: #FFC23C;}
+		#rf:active{background-color: #FFC23CDD;}
+		#ws{background-color: #80B918;font-size: 18px;position: absolute;top: 1.5rem;right: 8%;}
+		#ws:active{background-color: #80B918DD;}
+	</style>
+</head>
+<body>
+	<main>
+		<div class="control">
+			<button onclick="ft()" id="rf" title="Refresh Rooms">↻</button>
+			<button onclick="ft();cm(this)" id="ws" title="Toggle WebSocket Mode">WS</button>
+		</div>
+		<h2 id="aze">AZ</h2>
+		<div class="main" id="azerooms" style="margin-top: 2rem;">
+		</div>
+		<h2 id="tr">TR</h2>
+		<div class="main" id="trrooms">
+
+		</div>
+		<br>
+		<p>by MAGABEE &copy 2021-2022</p>
+	</main>
+<script>
+	let mode = 1;
+	const azerooms = document.getElementById('azerooms');
+	const trrooms = document.getElementById('trrooms');
+	//fetch aze rooms
+	function ft(){
+		azerooms.innerHTML = '<a id="viewallaze" href="#">View All (allow popups)</a>';
+		trrooms.innerHTML = '<a id="viewalltr" href="#">View All (allow popups)</a>';
+		fetch('https://gartic.io/req/list?search=&language[]=23')
+		.then(res => res.json())
+		.then(data => {
+			const onlyOnline = data.filter(room => room.quant > 0);
+			console.log(data);
+	        aze.innerHTML = 'AZ ' + '(' + onlyOnline.length + ')';
+			for (var key in onlyOnline ){
+	            
+				var lnk = document.createElement('a');
+				azerooms.appendChild(lnk);
+				lnk.href = 'https://gartic.io/' + onlyOnline[key].code + '/viewer';
+				lnk.target = '_blank';
+				lnk.innerHTML = onlyOnline[key].id.substring(mode) + ' &nbsp'  + onlyOnline[key].quant + ' / ' + onlyOnline[key].max;
+				if(onlyOnline[key].quant == onlyOnline[key].max){
+                	lnk.style.color = '#FEB139';
+            	}
+			}
+			document.getElementById('viewallaze').addEventListener('click', () => {
+				for(var k in onlyOnline){
+					window.open('https://gartic.io/' + onlyOnline[k].code + '/viewer');
+				}
+			});
+		});
+		//fetch tr rooms
+		fetch('https://gartic.io/req/list?search=&language[]=8')
+		.then(res => res.json())
+		.then(data => {
+			const onlyOnline = data.filter(room => room.quant > 0);
+			console.log(data);
+	        tr.innerHTML = 'TR ' + '(' + onlyOnline.length + ')';
+			for (var key in onlyOnline ){
+				var lnk = document.createElement('a');
+				trrooms.appendChild(lnk);
+				lnk.href = 'https://gartic.io/' + onlyOnline[key].code + '/viewer';
+				lnk.target = '_blank';
+				lnk.innerHTML = onlyOnline[key].id.substring(mode) + ' &nbsp'  + onlyOnline[key].quant + ' / ' + onlyOnline[key].max;
+				if(onlyOnline[key].quant == onlyOnline[key].max){
+                	lnk.style.color = '#FEB139';
+            	}
+			}
+			document.getElementById('viewalltr').addEventListener('click', () => {
+				for(var k in onlyOnline){
+					window.open('https://gartic.io/' + onlyOnline[k].code + '/viewer');
+				}
+			});
+		});
+	}
+	function cm(b){
+		if(mode == 1){
+			mode = 0;
+			b.style.backgroundColor = '#80B918DD';
+		}
+		else{
+			mode = 1;
+			b.style.backgroundColor = '#80B918';
+		}
+	}
+	ft();
+</script>
+</body>
+</html>
